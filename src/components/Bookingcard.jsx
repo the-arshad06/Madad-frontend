@@ -4,6 +4,7 @@ export default function BookingCard({ provider }) {
     const [ratings, setRatings] = useState({});
     const [message, setMessage] = useState("");
     const [reviews, setReviews] = useState([]);
+    const [serverRatings, setServerRatings] = useState({});
 
     // ✅ Fetch reviews on mount
     useEffect(() => {
@@ -19,7 +20,7 @@ export default function BookingCard({ provider }) {
                 data.reviews?.forEach((r) => {
                     savedRatings[r.bookingId] = r.rating;
                 });
-                setRatings(savedRatings);
+                setServerRatings(savedRatings);
             } catch (error) {
                 console.error("Error fetching reviews:", error);
             }
@@ -90,7 +91,11 @@ export default function BookingCard({ provider }) {
     return (
         <div className="flex flex-col gap-6 p-4 md:p-8">
             {provider.map((item) => {
-                const existingRating = ratings[item._id];
+                const ratingsFromServer = {};
+                reviews.forEach((r) => {
+                    ratingsFromServer[r.bookingId] = r.rating;
+                });
+                const existingRating = ratingsFromServer[item._id];
 
                 return (
                     <div
@@ -120,8 +125,8 @@ export default function BookingCard({ provider }) {
 
                             <span
                                 className={`mt-3 md:mt-0 px-3 py-1 text-xs rounded-full font-semibold ${item.status === "completed"
-                                        ? "bg-green-100 text-green-700"
-                                        : "bg-yellow-100 text-yellow-700"
+                                    ? "bg-green-100 text-green-700"
+                                    : "bg-yellow-100 text-yellow-700"
                                     }`}
                             >
                                 {item.status.toUpperCase()}
@@ -131,10 +136,12 @@ export default function BookingCard({ provider }) {
                         {/* Rating Section */}
                         {item.status === "completed" && (
                             <div className="flex flex-col md:flex-row items-start md:items-center gap-4 mt-3">
-                                {existingRating ? (
+                                {serverRatings[item._id] ? (
                                     <p className="text-lg font-semibold bg-white/20 px-4 py-2 rounded-full shadow-md">
                                         ⭐ You rated:{" "}
-                                        <span className="text-yellow-300 font-bold">{existingRating}</span>/5
+                                        <span className="text-yellow-300 font-bold">
+                                            {serverRatings[item._id]}
+                                        </span>/5
                                     </p>
                                 ) : (
                                     <>
@@ -152,7 +159,9 @@ export default function BookingCard({ provider }) {
 
                                         <button
                                             className="w-full md:w-40 bg-white text-blue-700 font-semibold py-2 px-4 rounded-full shadow-md hover:shadow-lg hover:bg-blue-100 transition-all duration-200"
-                                            onClick={() => handleSubmitRating(item._id, item.status, item.providerId._id)}
+                                            onClick={() =>
+                                                handleSubmitRating(item._id, item.status, item.providerId._id)
+                                            }
                                         >
                                             Submit Rating
                                         </button>
@@ -160,6 +169,7 @@ export default function BookingCard({ provider }) {
                                 )}
                             </div>
                         )}
+
 
                         {/* Message */}
                         {message && (
