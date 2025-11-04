@@ -2,7 +2,7 @@
 import { useState } from "react"
 import InputField from "../components/InputField"
 import Checkbox from "../components/Checkbox"
-import BtnComponent from "../components/btnComponent"
+import BtnComponent from "../components/BtnComponent"
 import HaveAcc from "../components/HaveAcc"
 import { useNavigate } from "react-router-dom"
 
