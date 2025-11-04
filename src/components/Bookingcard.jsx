@@ -1,0 +1,175 @@
+import { useState, useEffect } from "react";
+
+export default function BookingCard({ provider }) {
+    const [ratings, setRatings] = useState({});
+    const [message, setMessage] = useState("");
+    const [reviews, setReviews] = useState([]);
+
+    // ✅ Fetch reviews on mount
+    useEffect(() => {
+        async function fetchReviews() {
+            try {
+                const res = await fetch(`https://madad-c0ci.onrender.com/review`, {
+                    credentials: "include",
+                });
+                const data = await res.json();
+
+                setReviews(data.reviews || []);
+                const savedRatings = {};
+                data.reviews?.forEach((r) => {
+                    savedRatings[r.bookingId] = r.rating;
+                });
+                setRatings(savedRatings);
+            } catch (error) {
+                console.error("Error fetching reviews:", error);
+            }
+        }
+
+        fetchReviews();
+    }, []);
+
+    // ✅ Handle rating input
+    function handleRatingChange(e, id) {
+        let value = parseInt(e.target.value, 10);
+        if (isNaN(value)) value = "";
+        else if (value < 1) value = 1;
+        else if (value > 5) value = 5;
+        setRatings((prev) => ({ ...prev, [id]: value }));
+    }
+
+    // ✅ Submit rating
+    async function handleSubmitRating(bookingId, status, providerId) {
+        const rating = ratings[bookingId];
+        if (!rating) {
+            setMessage("Please enter a rating before submitting!");
+            return;
+        }
+
+        try {
+            const res = await fetch(`https://madad-c0ci.onrender.com/review`, {
+                method: "POST",
+                headers: { "content-type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ bookingId, status, rating, providerId }),
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                // Refresh reviews
+                const refresh = await fetch(`https://madad-c0ci.onrender.com/review`, {
+                    credentials: "include",
+                });
+                const refreshed = await refresh.json();
+                setReviews(refreshed.reviews);
+
+                const savedRatings = {};
+                refreshed.reviews.forEach((r) => {
+                    savedRatings[r.bookingId] = r.rating;
+                });
+                setRatings(savedRatings);
+
+                setMessage("✅ Review submitted successfully!");
+            } else {
+                setMessage(data.message || "Something went wrong!");
+            }
+        } catch (error) {
+            console.error("Error submitting review:", error);
+            setMessage("❌ Something went wrong!");
+        }
+    }
+
+    // ✅ Empty state
+    if (!provider || provider.length === 0) {
+        return (
+            <div className="text-center text-gray-600 py-10">
+                <h1 className="text-xl font-semibold">No bookings found 😔</h1>
+            </div>
+        );
+    }
+
+    return (
+        <div className="flex flex-col gap-6 p-4 md:p-8">
+            {provider.map((item) => {
+                const existingRating = ratings[item._id];
+
+                return (
+                    <div
+                        key={item._id}
+                        className="bg-gradient-to-br from-blue-600 via-teal-500 to-cyan-400 rounded-2xl shadow-2xl text-white backdrop-blur-md bg-opacity-90 p-6 transition-all duration-300 hover:scale-[1.01]"
+                    >
+                        {/* Header Info */}
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-white/30 pb-3 mb-3">
+                            <div>
+                                <h3 className="font-bold text-xl mb-1">👤 {item?.providerId?.name}</h3>
+                                <p className="text-sm opacity-90 mb-1">
+                                    🏷 <span className="font-medium">{item.providerId?.category?.toUpperCase()}</span>
+                                </p>
+                                <p className="text-sm opacity-90 mb-1">📦 Status: {item.status}</p>
+                                <p className="text-sm opacity-90">
+                                    ⏰{" "}
+                                    {new Date(item.createdAt).toLocaleString("en-IN", {
+                                        day: "2-digit",
+                                        month: "short",
+                                        year: "numeric",
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                        hour12: true,
+                                    })}
+                                </p>
+                            </div>
+
+                            <span
+                                className={`mt-3 md:mt-0 px-3 py-1 text-xs rounded-full font-semibold ${item.status === "completed"
+                                        ? "bg-green-100 text-green-700"
+                                        : "bg-yellow-100 text-yellow-700"
+                                    }`}
+                            >
+                                {item.status.toUpperCase()}
+                            </span>
+                        </div>
+
+                        {/* Rating Section */}
+                        {item.status === "completed" && (
+                            <div className="flex flex-col md:flex-row items-start md:items-center gap-4 mt-3">
+                                {existingRating ? (
+                                    <p className="text-lg font-semibold bg-white/20 px-4 py-2 rounded-full shadow-md">
+                                        ⭐ You rated:{" "}
+                                        <span className="text-yellow-300 font-bold">{existingRating}</span>/5
+                                    </p>
+                                ) : (
+                                    <>
+                                        <label className="text-sm flex items-center gap-2">
+                                            ⭐ Rate:
+                                            <input
+                                                type="number"
+                                                min={1}
+                                                max={5}
+                                                value={ratings[item._id] || ""}
+                                                onChange={(e) => handleRatingChange(e, item._id)}
+                                                className="w-16 rounded-md border border-white bg-white/20 text-white text-center font-semibold focus:outline-none focus:ring-2 focus:ring-yellow-300"
+                                            />
+                                        </label>
+
+                                        <button
+                                            className="w-full md:w-40 bg-white text-blue-700 font-semibold py-2 px-4 rounded-full shadow-md hover:shadow-lg hover:bg-blue-100 transition-all duration-200"
+                                            onClick={() => handleSubmitRating(item._id, item.status, item.providerId._id)}
+                                        >
+                                            Submit Rating
+                                        </button>
+                                    </>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Message */}
+                        {message && (
+                            <p className="mt-3 text-sm text-yellow-200 font-medium italic">
+                                {message}
+                            </p>
+                        )}
+                    </div>
+                );
+            })}
+        </div>
+    );
+}
