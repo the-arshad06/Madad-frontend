@@ -9,7 +9,7 @@ import Home from './pages/Home.jsx';
 import ProviderDetails from './pages/ProviderDetails.jsx';
 import Bookings from './pages/Bookings.jsx';
 import Profile from './pages/Profile.jsx';
-import EditProfile from './pages/edit.jsx';
+import Edit from "./pages/Edit.jsx"; 
 import HelpSupport from './pages/HelpSupport.jsx';
 
 const router = createBrowserRouter([{
@@ -20,7 +20,7 @@ const router = createBrowserRouter([{
     { path: "provider/:id", element: <ProviderDetails /> },
     { path: "bookings", element: <Bookings /> },
     { path: "Help", element: <HelpSupport /> },
-    { path: "edit", element: <EditProfile /> },
+    { path: "edit", element: <Edit /> },
     { path: "profile", element: <Profile /> },
     { path: "signup", element: <Signup /> },
     { path: "login", element: <Login /> }
