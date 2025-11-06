@@ -8,6 +8,8 @@ export default async function OneSignalInit() {
         appId: "19446a03-690a-4ff1-a3b4-9aeb313da54e",
         allowLocalhostAsSecureOrigin: true,
         notifyButton: { enable: true },
+        serviceWorkerPath: "../public/OneSignalSDKWorker.js",
+        serviceWorkerParam: { scope: "../public/onesignal/js/" },
     });
 
     console.log("✅ OneSignal Initialized");
@@ -23,10 +25,10 @@ export default async function OneSignalInit() {
 
         const playerId = await OneSignal.User.PushSubscription.id;
         if (playerId) {
-           const res =  await fetch(`${url}/user/saveplayerid`, {
+            const res = await fetch(`${url}/user/saveplayerid`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                credentials : "include",
+                credentials: "include",
                 body: JSON.stringify({ playerId }),
             });
             const data = await res.json()
