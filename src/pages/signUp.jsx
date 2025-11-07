@@ -13,7 +13,7 @@ export default function Signup() {
     const [error, seterror] = useState("")
     const googleBtn = useRef(null);
     const navigator = useNavigate()
-    const url = "https://madad-c0ci.onrender.com"
+    const url = "http://localhost:4000"
     function onchange(e) {
         setform({ ...form, [e.target.name]: e.target.type === "checkbox" ? e.target.checked : e.target.value })
         console.log(e.target.type);
@@ -100,9 +100,9 @@ export default function Signup() {
                 <div className="logo text-2xl font-bold text-blue-600">Logo</div>
                 <div className="title text-xl font-semibold text-gray-800">Create Account</div>
                 <div className="inputs w-full flex flex-col space-y-4">
-                    <InputField type="text" name={"name"} placeholder="Enter your Name" value={form.name} onChange={onchange} />
-                    <InputField type="email" name={"email"} placeholder="Enter your Email" value={form.email} onChange={onchange} />
-                    <InputField type="password" name={"password"} placeholder="Enter your Password" value={form.password} onChange={onchange} />
+                    <InputField type="text" name={"name"} placeholder="Enter your Name" value={form.name} onChange={onchange} icon={"user"}/>
+                    <InputField type="email" name={"email"} placeholder="Enter your Email" value={form.email} onChange={onchange} icon={"mail"}/>
+                    <InputField type="password" name={"password"} placeholder="Enter your Password" value={form.password} onChange={onchange} icon={"lock"}/>
                     <Checkbox checked={check} onChange={onchange} name={"terms"} />
                     <p className="text-red-500 b-500">{error}</p>
                     <BtnComponent text="Sign Up" onClick={handleSubmit} />

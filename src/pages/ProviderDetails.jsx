@@ -3,15 +3,16 @@ import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { Phone, MapPin, Star, CheckCircle, XCircle } from "lucide-react"; // ✅ Lucide React icons
 
 export default function ProviderDetails() {
     const { id } = useParams();
     const [provider, setProvider] = useState(null);
     const [showPopup, setShowPopup] = useState(false);
-    const [data, setdata] = useState()
+    const [data, setdata] = useState();
     const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-    const url = "https://madad-c0ci.onrender.com"
+    const url = "http://localhost:4000";
     console.log(provider);
 
     useEffect(() => {
@@ -33,20 +34,18 @@ export default function ProviderDetails() {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
-                body: JSON.stringify({ providerId: provider._id, status: "Requested" })
+                body: JSON.stringify({ providerId: provider._id, status: "Requested" }),
             });
 
             const data = await res.json();
             setdata(data);
 
-            // ✅ Show modal for 5 seconds
             setShowSuccessModal(true);
             setTimeout(() => setShowSuccessModal(false), 5000);
         } catch (error) {
             console.error("Booking failed:", error);
         }
     }
-
 
     const providerIcon = new L.Icon({
         iconUrl: "https://cdn-icons-png.flaticon.com/512/854/854866.png",
@@ -57,175 +56,178 @@ export default function ProviderDetails() {
 
     return (
         <div className="flex justify-center py-10 bg-gray-100 min-h-screen relative">
-            {showPopup ? <div className="bg-white blur-sm rounded-2xl shadow-lg p-6 w-full max-w-md">
-                {/* Profile Section */}
-                <div className="flex flex-col items-center text-center">
-                    <img
-                        src={
-                            provider.image ||
-                            "https://cdn-icons-png.flaticon.com/512/921/921071.png"
-                        }
-                        alt={provider.name}
-                        className="w-28 h-28 rounded-full mb-3"
-                    />
-                    <h1 className="text-2xl font-bold">{provider.name}</h1>
-                    <div className="flex items-center space-x-2 mt-1 text-yellow-500">
-                        <span>⭐</span>
-                        <span>{provider.averageRating}/5</span>
+            {showPopup || showSuccessModal ? (
+                <div className="bg-white blur-sm rounded-2xl shadow-lg p-6 w-full max-w-md">
+                    {/* Profile Section */}
+                    <div className="flex flex-col items-center text-center">
+                        <img
+                            src={
+                                provider.image ||
+                                "https://cdn-icons-png.flaticon.com/512/921/921071.png"
+                            }
+                            alt={provider.name}
+                            className="w-28 h-28 rounded-full mb-3"
+                        />
+                        <h1 className="text-2xl font-bold">{provider.name}</h1>
+                        <div className="flex items-center space-x-2 mt-1 text-yellow-500">
+                            <Star size={18} fill="gold" stroke="gold" /> {/* ⭐ Icon */}
+                            <span>{provider.averageRating}/5</span>
+                        </div>
+                        <p className="text-gray-600 mt-1">{provider.category}</p>
                     </div>
-                    <p className="text-gray-600 mt-1">{provider.category}</p>
-                </div>
 
-                {/* Contact Section */}
-                <div className="mt-4 text-gray-700">
-                    <div className="flex items-center justify-center space-x-2">
-                        <span>📞</span>
-                        <span>{provider.phone || "N/A"}</span>
+                    {/* Contact Section */}
+                    <div className="mt-4 text-gray-700">
+                        <div className="flex items-center justify-center space-x-2">
+                            <Phone size={18} className="text-blue-500" /> {/* 📞 */}
+                            <span>{provider.phone || "N/A"}</span>
+                        </div>
+                        <div className="flex items-center justify-center space-x-2 mt-1">
+                            <MapPin size={18} className="text-red-500" /> {/* 📍 */}
+                            <span>{provider.address || "Location not specified"}</span>
+                        </div>
                     </div>
-                    <div className="flex items-center justify-center space-x-2 mt-1">
-                        <span>📍</span>
-                        <span>{provider.address || "Location not specified"}</span>
+
+                    {/* Services Provided */}
+                    <div className="mt-6">
+                        <h3 className="text-lg font-semibold mb-2 text-left">
+                            Services Provided
+                        </h3>
+                        <ul className="text-gray-600 list-disc list-inside space-y-1">
+                            {provider.services?.length ? (
+                                provider.services.map((srv, i) => <li key={i}>{srv}</li>)
+                            ) : (
+                                <li>No services listed</li>
+                            )}
+                        </ul>
                     </div>
-                </div>
 
-                {/* Services Provided */}
-                <div className="mt-6">
-                    <h3 className="text-lg font-semibold mb-2 text-left">
-                        Services Provided
-                    </h3>
-                    <ul className="text-gray-600 list-disc list-inside space-y-1">
-                        {provider.services?.length ? (
-                            provider.services.map((srv, i) => <li key={i}>{srv}</li>)
-                        ) : (
-                            <li>No services listed</li>
-                        )}
-                    </ul>
-                </div>
+                    {/* About Me */}
+                    <div className="mt-6">
+                        <h3 className="text-lg font-semibold mb-2 text-left">About Me</h3>
+                        <p className="text-gray-600 text-sm">
+                            {provider.description ||
+                                "Experienced professional offering reliable and high-quality service."}
+                        </p>
+                    </div>
 
-                {/* About Me */}
-                <div className="mt-6">
-                    <h3 className="text-lg font-semibold mb-2 text-left">About Me</h3>
-                    <p className="text-gray-600 text-sm">
-                        {provider.description ||
-                            "Experienced professional offering reliable and high-quality service."}
-                    </p>
-                </div>
-
-                {/* Map Section */}
-                <div className="mt-6 w-full h-[250px] rounded-lg overflow-hidden shadow-md">
-                    <MapContainer
-                        center={[
-                            provider.location.coordinates[1],
-                            provider.location.coordinates[0],
-                        ]}
-                        zoom={14}
-                        style={{ height: "100%", width: "100%" }}
-                    >
-                        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                        <Marker
-                            position={[
+                    {/* Map Section */}
+                    <div className="mt-6 w-full h-[250px] rounded-lg overflow-hidden shadow-md">
+                        <MapContainer
+                            center={[
                                 provider.location.coordinates[1],
                                 provider.location.coordinates[0],
                             ]}
-                            icon={providerIcon}
+                            zoom={14}
+                            style={{ height: "100%", width: "100%" }}
                         >
-                            <Popup>{provider.name}</Popup>
-                        </Marker>
-                    </MapContainer>
-                </div>
-                <p className="text-black-200 my-5">{data?.message}</p>
-                {/* Book Now Button */}
-                <button
-                    onClick={() => setShowPopup(true)}
-                    className="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold transition"
-                >
-                    Book Now
-                </button>
-            </div> : <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md">
-                {/* Profile Section */}
-                <div className="flex flex-col items-center text-center">
-                    <img
-                        src={
-                            provider.image ||
-                            "https://cdn-icons-png.flaticon.com/512/921/921071.png"
-                        }
-                        alt={provider.name}
-                        className="w-28 h-28 rounded-full mb-3"
-                    />
-                    <h1 className="text-2xl font-bold">{provider.name}</h1>
-                    <div className="flex items-center space-x-2 mt-1 text-yellow-500">
-                        <span>⭐</span>
-                        <span>{provider.averageRating}/5</span>
+                            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                            <Marker
+                                position={[
+                                    provider.location.coordinates[1],
+                                    provider.location.coordinates[0],
+                                ]}
+                                icon={providerIcon}
+                            >
+                                <Popup>{provider.name}</Popup>
+                            </Marker>
+                        </MapContainer>
                     </div>
-                    <p className="text-gray-600 mt-1">{provider.category}</p>
-                </div>
-
-                {/* Contact Section */}
-                <div className="mt-4 text-gray-700">
-                    <div className="flex items-center justify-center space-x-2">
-                        <span>📞</span>
-                        <span>{provider.phone || "N/A"}</span>
-                    </div>
-                    <div className="flex items-center justify-center space-x-2 mt-1">
-                        <span>📍</span>
-                        <span>{provider.address || "Location not specified"}</span>
-                    </div>
-                </div>
-
-                {/* Services Provided */}
-                <div className="mt-6">
-                    <h3 className="text-lg font-semibold mb-2 text-left">
-                        Services Provided
-                    </h3>
-                    <ul className="text-gray-600 list-disc list-inside space-y-1">
-                        {provider.services?.length ? (
-                            provider.services.map((srv, i) => <li key={i}>{srv}</li>)
-                        ) : (
-                            <li>No services listed</li>
-                        )}
-                    </ul>
-                </div>
-
-                {/* About Me */}
-                <div className="mt-6">
-                    <h3 className="text-lg font-semibold mb-2 text-left">About Me</h3>
-                    <p className="text-gray-600 text-sm">
-                        {provider.description ||
-                            "Experienced professional offering reliable and high-quality service."}
-                    </p>
-                </div>
-
-                {/* Map Section */}
-                <div className="mt-6 w-full h-[250px] rounded-lg overflow-hidden shadow-md">
-                    <MapContainer
-                        center={[
-                            provider.location.coordinates[1],
-                            provider.location.coordinates[0],
-                        ]}
-                        zoom={14}
-                        style={{ height: "100%", width: "100%" }}
+                    <p className="text-black-200 my-5">{data?.message}</p>
+                    <button
+                        onClick={() => setShowPopup(true)}
+                        className="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold transition"
                     >
-                        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                        <Marker
-                            position={[
+                        Book Now
+                    </button>
+                </div>
+            ) : (
+                <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md">
+                    {/* Profile Section */}
+                    <div className="flex flex-col items-center text-center">
+                        <img
+                            src={
+                                provider.image ||
+                                "https://cdn-icons-png.flaticon.com/512/921/921071.png"
+                            }
+                            alt={provider.name}
+                            className="w-28 h-28 rounded-full mb-3"
+                        />
+                        <h1 className="text-2xl font-bold">{provider.name}</h1>
+                        <div className="flex items-center space-x-2 mt-1 text-yellow-500">
+                            <Star size={18} fill="gold" stroke="gold" />
+                            <span>{provider.averageRating}/5</span>
+                        </div>
+                        <p className="text-gray-600 mt-1">{provider.category}</p>
+                    </div>
+
+                    {/* Contact Section */}
+                    <div className="mt-4 text-gray-700">
+                        <div className="flex items-center justify-center space-x-2">
+                            <Phone size={18} className="text-blue-500" />
+                            <span>{provider.phone || "N/A"}</span>
+                        </div>
+                        <div className="flex items-center justify-center space-x-2 mt-1">
+                            <MapPin size={18} className="text-red-500" />
+                            <span>{provider.address || "Location not specified"}</span>
+                        </div>
+                    </div>
+
+                    {/* Services Provided */}
+                    <div className="mt-6">
+                        <h3 className="text-lg font-semibold mb-2 text-left">
+                            Services Provided
+                        </h3>
+                        <ul className="text-gray-600 list-disc list-inside space-y-1">
+                            {provider.services?.length ? (
+                                provider.services.map((srv, i) => <li key={i}>{srv}</li>)
+                            ) : (
+                                <li>No services listed</li>
+                            )}
+                        </ul>
+                    </div>
+
+                    {/* About Me */}
+                    <div className="mt-6">
+                        <h3 className="text-lg font-semibold mb-2 text-left">About Me</h3>
+                        <p className="text-gray-600 text-sm">
+                            {provider.description ||
+                                "Experienced professional offering reliable and high-quality service."}
+                        </p>
+                    </div>
+
+                    {/* Map Section */}
+                    <div className="mt-6 w-full h-[250px] rounded-lg overflow-hidden shadow-md">
+                        <MapContainer
+                            center={[
                                 provider.location.coordinates[1],
                                 provider.location.coordinates[0],
                             ]}
-                            icon={providerIcon}
+                            zoom={14}
+                            style={{ height: "100%", width: "100%" }}
                         >
-                            <Popup>{provider.name}</Popup>
-                        </Marker>
-                    </MapContainer>
+                            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                            <Marker
+                                position={[
+                                    provider.location.coordinates[1],
+                                    provider.location.coordinates[0],
+                                ]}
+                                icon={providerIcon}
+                            >
+                                <Popup>{provider.name}</Popup>
+                            </Marker>
+                        </MapContainer>
+                    </div>
+
+                    {/* Book Now Button */}
+                    <button
+                        onClick={() => setShowPopup(true)}
+                        className="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold transition"
+                    >
+                        Book Now
+                    </button>
                 </div>
-                <p className="text-black-200 my-5">{data?.message}</p>
-                {/* Book Now Button */}
-                <button
-                    onClick={() => setShowPopup(true)}
-                    className="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold transition"
-                >
-                    Book Now
-                </button>
-            </div>}
+            )}
 
             {/* Popup Modal */}
             {showPopup && (
@@ -240,16 +242,18 @@ export default function ProviderDetails() {
                             <button
                                 onClick={() => {
                                     setShowPopup(false);
-                                    createBooking()
+                                    createBooking();
                                 }}
-                                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg w-1/2"
+                                className="flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg w-1/2 gap-2"
                             >
+                                <CheckCircle size={18} />
                                 Confirm
                             </button>
                             <button
                                 onClick={() => setShowPopup(false)}
-                                className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg w-1/2"
+                                className="flex items-center justify-center bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg w-1/2 gap-2"
                             >
+                                <XCircle size={18} />
                                 Cancel
                             </button>
                         </div>
@@ -258,14 +262,17 @@ export default function ProviderDetails() {
             )}
 
             {showSuccessModal && (
-                <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-30">
+                <div className="fixed inset-0 flex items-center justify-center z-50 bg-opacity-30">
                     <div className="bg-white rounded-2xl shadow-xl p-6 w-80 text-center animate-fade-in">
-                        <h2 className="text-xl font-semibold text-green-600 mb-2">Booking Status</h2>
-                        <p className="text-gray-700">{data?.message || "Booking successful!"}</p>
+                        <h2 className="text-xl font-semibold text-green-600 mb-2">
+                            Booking Status
+                        </h2>
+                        <p className="text-gray-700">
+                            {data?.message || "Booking successful!"}
+                        </p>
                     </div>
                 </div>
             )}
-
         </div>
     );
 }

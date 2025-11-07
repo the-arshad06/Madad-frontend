@@ -8,7 +8,7 @@ export default function Login() {
   const navigate = useNavigate();
   const [form, setform] = useState({ email: "", password: "" });
   const [error, seterror] = useState("");
-  const url = "https://madad-c0ci.onrender.com";
+  const url = "http://localhost:4000";
   const googleBtn = useRef(null); // ✅ Ref to attach Google button
 
   // ✅ Initialize Google login when component mounts
@@ -112,6 +112,7 @@ export default function Login() {
             placeholder="Enter your Email"
             value={form.email}
             onChange={onchange}
+            icon={"mail"}
           />
           <InputField
             type="password"
@@ -119,6 +120,7 @@ export default function Login() {
             placeholder="Enter your Password"
             value={form.password}
             onChange={onchange}
+            icon={"lock"}
           />
           <p className="text-red-500">{error}</p>
 

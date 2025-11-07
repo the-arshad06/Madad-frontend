@@ -1,19 +1,30 @@
 import { Link } from "react-router-dom";
+import { ShieldCheck } from "lucide-react";
 
-export default function Checkbox({ checked, onChange ,name }) {
+export default function Checkbox({ checked, onChange, name }) {
   return (
-    <div className="flex items-center mb-6 text-sm">
+    <div className="flex items-start gap-2 mb-6 text-sm">
+      {/* Checkbox input */}
       <input
         type="checkbox"
-        id="terms"
+        id={name || "terms"}
         name={name}
         checked={checked}
         onChange={onChange}
-        className="mr-2 w-4 h-4 accent-teal-500"
+        className="mt-1 w-4 h-4 accent-teal-500 cursor-pointer"
       />
-      <label htmlFor="terms" className="text-gray-600">
+
+      {/* Label with icon and link */}
+      <label
+        htmlFor={name || "terms"}
+        className="text-gray-600 flex items-center gap-1"
+      >
+        <ShieldCheck size={16} className="text-teal-500" />
         I agree to the{" "}
-        <Link to={"/terms"} className="text-blue-600 underline">
+        <Link
+          to="/terms"
+          className="text-blue-600 underline font-medium hover:text-blue-700"
+        >
           Terms and Conditions
         </Link>
       </label>

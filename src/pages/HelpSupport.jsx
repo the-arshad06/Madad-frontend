@@ -1,7 +1,7 @@
-import React from "react";
+import { Mail, Clock } from "lucide-react";
 
 export default function HelpSupport() {
-  const supportEmail = "support@example.com"; // change this to your real email
+  const supportEmail = "support@example.com"; // ✅ replace with your real email
 
   const handleEmailClick = () => {
     window.location.href = `mailto:${supportEmail}`;
@@ -11,7 +11,9 @@ export default function HelpSupport() {
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100 px-4">
       <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md text-center">
-        <h1 className="text-2xl font-bold mb-3">Help & Support</h1>
+        <h1 className="text-2xl font-bold mb-3 text-gray-800">
+          Help & Support
+        </h1>
         <p className="text-gray-600 mb-6">
           Need assistance? We're here to help you.  
           Please reach out to us anytime via email.
@@ -19,14 +21,16 @@ export default function HelpSupport() {
 
         <button
           onClick={handleEmailClick}
-          className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-full transition"
+          className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-teal-400 hover:opacity-90 text-white font-semibold py-2 px-6 rounded-full transition duration-200 shadow-md"
         >
-          📧 Contact Us at {supportEmail}
+          <Mail className="w-5 h-5" />
+          Contact Us at {supportEmail}
         </button>
 
-        <p className="text-gray-400 text-sm mt-6">
-          We usually respond within 24 hours.
-        </p>
+        <div className="flex items-center justify-center gap-2 text-gray-400 text-sm mt-6">
+          <Clock className="w-4 h-4" />
+          <span>We usually respond within 24 hours.</span>
+        </div>
       </div>
     </div>
   );
