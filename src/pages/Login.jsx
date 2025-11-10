@@ -8,13 +8,14 @@ export default function Login() {
   const navigate = useNavigate();
   const [form, setform] = useState({ email: "", password: "" });
   const [error, seterror] = useState("");
-  const url = "https://madad-c0ci.onrender.com";
+  const url = "http://localhost:4000";
   const googleBtn = useRef(null); // ✅ Ref to attach Google button
 
-  // ✅ Initialize Google login when component mounts
+  // ✅ Initialize Google login when component mounts (Logic untouched)
   useEffect(() => {
-    /* global google */ // let eslint know google is global
+    /* global google */ 
     if (window.google) {
+        // ... (Logic untouched)
       google.accounts.id.initialize({
         client_id:
           "854104136103-pd3n2tps6n0pfpo8k9h2qonef1tvdbc1.apps.googleusercontent.com",
@@ -55,13 +56,13 @@ export default function Login() {
     }
   }, [url]);
 
-  // ✅ handle input change
+  // ✅ handle input change (Logic untouched)
   function onchange(e) {
     setform({ ...form, [e.target.name]: e.target.value });
     seterror("");
   }
 
-  // ✅ handle normal email/password login
+  // ✅ handle normal email/password login (Logic untouched)
   async function handleSubmit(e) {
     e.preventDefault();
     if (!form.password) return seterror("Password is required");
@@ -98,14 +99,16 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-sky-50 p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 flex flex-col items-center space-y-6">
-        <div className="logo text-2xl font-bold text-blue-600">Logo</div>
-        <div className="title text-xl font-semibold text-gray-800">
-          Login to your Account
+    // REDESIGN: Smoother background color
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+      {/* REDESIGN: Enhanced Card Look */}
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-8 flex flex-col items-center space-y-8 border border-gray-100">
+        <div className="logo text-3xl font-extrabold text-indigo-600">YourBrand</div> {/* Adjusted Logo Text */}
+        <div className="title text-2xl font-bold text-gray-800">
+          Sign In to Your Account
         </div>
 
-        <div className="inputs w-full flex flex-col space-y-4">
+        <div className="inputs w-full flex flex-col space-y-6">
           <InputField
             type="email"
             name="email"
@@ -122,10 +125,17 @@ export default function Login() {
             onChange={onchange}
             icon={"lock"}
           />
-          <p className="text-red-500">{error}</p>
+          <p className="text-red-500 font-medium text-sm">{error}</p>
 
           <BtnComponent text="Login" onClick={handleSubmit} />
-          <div ref={googleBtn} className="flex justify-center mt-4"></div>
+          
+          {/* REDESIGN: Separator for visual hierarchy */}
+          <div className="relative flex justify-center items-center py-2">
+            <div className="absolute w-full border-t border-gray-200"></div>
+            <span className="relative bg-white px-3 text-sm text-gray-500">Or</span>
+          </div>
+          
+          <div ref={googleBtn} className="flex justify-center"></div>
           <HaveAcc />
         </div>
       </div>

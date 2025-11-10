@@ -12,7 +12,7 @@ export default function ProviderDetails() {
     const [data, setdata] = useState();
     const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-    const url = "https://madad-c0ci.onrender.com";
+    const url = "http://localhost:4000";
     console.log(provider);
 
     useEffect(() => {
@@ -55,7 +55,7 @@ export default function ProviderDetails() {
     if (!provider) return <p className="text-center mt-10">Loading...</p>;
 
     return (
-        <div className="flex justify-center py-10 bg-gray-100 min-h-screen relative">
+        <div className="flex justify-center py-10 px-4 bg-gray-100 min-h-screen relative pb-40">
             {showPopup || showSuccessModal ? (
                 <div className="bg-white blur-sm rounded-2xl shadow-lg p-6 w-full max-w-md">
                     {/* Profile Section */}
@@ -136,7 +136,8 @@ export default function ProviderDetails() {
                     <p className="text-black-200 my-5">{data?.message}</p>
                     <button
                         onClick={() => setShowPopup(true)}
-                        className="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold transition"
+                        // FIX: Added mb-16 for clearance
+                        className="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold transition mb-16" 
                     >
                         Book Now
                     </button>
@@ -222,7 +223,8 @@ export default function ProviderDetails() {
                     {/* Book Now Button */}
                     <button
                         onClick={() => setShowPopup(true)}
-                        className="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold transition"
+                        // FIX: Added mb-16 for clearance
+                        className="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold transition mb-16"
                     >
                         Book Now
                     </button>

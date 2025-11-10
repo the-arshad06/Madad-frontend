@@ -4,9 +4,9 @@ export default function EditProfile() {
   const [user, setUser] = useState(null);
   const [formData, setFormData] = useState({ name: "", email: "" });
   const [resData, setResData] = useState(null);
-  const url = "https://madad-c0ci.onrender.com";
+  const url = "http://localhost:4000";
 
-  // ✅ Fetch user on page load
+  // ✅ Fetch user on page load (Logic untouched)
   useEffect(() => {
     async function fetchUser() {
       try {
@@ -34,7 +34,7 @@ export default function EditProfile() {
     setFormData({ ...formData, [name]: value });
   };
 
-  // ✅ PUT request to update user
+  // ✅ PUT request to update user (Logic untouched)
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Updated Data:", formData);
@@ -58,37 +58,43 @@ export default function EditProfile() {
   };
 
   if (!user) {
-    return <h1 className="text-center text-xl font-semibold py-10">Loading...</h1>;
+    return <h1 className="text-center text-xl font-semibold py-10 text-gray-600">Loading...</h1>;
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-sm">
-        <h1 className="text-2xl font-bold text-center mb-5">Edit Profile</h1>
+    // REDESIGN: Smoother background color
+    <div className="flex justify-center items-center min-h-screen bg-gray-50 p-4">
+      {/* REDESIGN: Enhanced Card Look */}
+      <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-lg border border-gray-100">
+        <h1 className="text-3xl font-extrabold text-center mb-8 text-gray-900">
+          Edit Profile
+        </h1>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           {/* Name Field */}
           <div>
-            <label className="block text-gray-700 font-medium mb-1">Name</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Name</label>
             <input
               type="text"
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              // REDESIGN: Polished Input Styles
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150"
               placeholder="Enter your name"
             />
           </div>
 
           {/* Email Field */}
           <div>
-            <label className="block text-gray-700 font-medium mb-1">Email</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
             <input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              // REDESIGN: Polished Input Styles
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150"
               placeholder="Enter your email"
             />
           </div>
@@ -96,7 +102,8 @@ export default function EditProfile() {
           {/* Save Button */}
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition"
+            // REDESIGN: Primary button style using indigo
+            className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition duration-150 shadow-md hover:shadow-lg"
           >
             Save Changes
           </button>
@@ -104,7 +111,7 @@ export default function EditProfile() {
 
         {/* Optional response message */}
         {resData && (
-          <p className="text-center text-green-600 mt-3">
+          <p className="text-center text-green-600 font-medium mt-4">
             ✅ {resData.message || "Profile updated successfully!"}
           </p>
         )}

@@ -5,10 +5,13 @@ export default function BtnComponent({ text, onClick, disabled, loading = false 
     <button
       onClick={onClick}
       disabled={disabled || loading}
-      className={`w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-teal-400 text-white font-semibold py-2 rounded-full transition-all duration-200 shadow-md ${
+      className={`w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-teal-500 text-white font-bold 
+                 py-3 rounded-xl transition-all duration-200 
+                 shadow-lg shadow-blue-500/50 hover:shadow-xl hover:shadow-blue-500/70 // ENHANCED SHADOW
+                 ${
         disabled || loading
           ? "opacity-60 cursor-not-allowed"
-          : "hover:opacity-90 hover:shadow-lg"
+          : "hover:opacity-90 hover:scale-[1.01]" // ADDED subtle scale on hover
       }`}
     >
       {/* Optional Loading Spinner */}

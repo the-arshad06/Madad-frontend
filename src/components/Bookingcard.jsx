@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { User, Tag, Package, Clock, Star, MessageSquare } from "lucide-react";
+import { User, Tag, Calendar, Clock, Star, MessageSquare, Briefcase } from "lucide-react";
 
 export default function BookingCard({ provider }) {
   const [ratings, setRatings] = useState({});
@@ -7,7 +7,7 @@ export default function BookingCard({ provider }) {
   const [reviews, setReviews] = useState([]);
   const [serverRatings, setServerRatings] = useState({});
   const [comment, setComment] = useState("");
-  const url = "https://madad-c0ci.onrender.com";
+  const url = "http://localhost:4000";
 
   function onChange(e) {
     setComment(e.target.value);
@@ -64,17 +64,17 @@ export default function BookingCard({ provider }) {
 
         const savedRatings = {};
         refreshed.reviews.forEach((r) => {
-          savedRatings[r.bookingId] = r.rating;
+          savedRatings[r.bookingId] = { rating: r.rating, comment: r.comment }; 
         });
-        setRatings(savedRatings);
+        setServerRatings(savedRatings); 
 
-        setMessage("✅ Review submitted successfully!");
+        setMessage("✅ Review submitted successfully! Thank you.");
       } else {
-        setMessage(data.message || "Something went wrong!");
+        setMessage(data.message || "❌ Failed to submit review!");
       }
     } catch (error) {
       console.error("Error submitting review:", error);
-      setMessage("❌ Something went wrong!");
+      setMessage("❌ Network error occurred while submitting review.");
     }
   }
 
@@ -90,98 +90,111 @@ export default function BookingCard({ provider }) {
     <div className="flex flex-col gap-6 p-4 md:p-8">
       {provider.map((item) => {
         const existingRating = serverRatings[item._id];
+        const bookingDate = new Date(item.createdAt);
+        const formattedDate = bookingDate.toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" });
+        const formattedTime = bookingDate.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
+        
+        const isCompleted = item.status === "completed";
 
         return (
           <div
             key={item._id}
-            className="bg-gradient-to-br from-blue-600 via-teal-500 to-cyan-400 rounded-2xl shadow-2xl text-white backdrop-blur-md bg-opacity-90 p-6 transition-all duration-300 hover:scale-[1.01]"
+            // Card Style: Clean white, deep shadow, subtle hover effect
+            className="bg-white rounded-xl shadow-xl p-6 border border-gray-100 transition-all duration-300 hover:shadow-2xl hover:border-blue-200"
           >
-            {/* Header Info */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-white/30 pb-3 mb-3">
-              <div>
-                <h3 className="font-bold text-xl mb-1 flex items-center gap-2">
-                  <User size={18} /> {item?.providerId?.name}
-                </h3>
-                <p className="text-sm opacity-90 mb-1 flex items-center gap-2">
-                  <Tag size={16} />{" "}
-                  <span className="font-medium">
-                    {item.providerId?.category?.toUpperCase()}
-                  </span>
-                </p>
-                <p className="text-sm opacity-90 mb-1 flex items-center gap-2">
-                  <Package size={16} /> Status: {item.status}
-                </p>
-                <p className="text-sm opacity-90 flex items-center gap-2">
-                  <Clock size={16} />
-                  {new Date(item.createdAt).toLocaleString("en-IN", {
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: true,
-                  })}
-                </p>
-              </div>
+            
+            {/* 1. Header & Status */}
+            <div className="flex justify-between items-start border-b border-gray-100 pb-4 mb-4">
+              <h3 className="font-bold text-xl flex items-center gap-2 text-gray-900">
+                <User size={20} className="text-blue-600" /> 
+                {item?.providerId?.name}
+              </h3>
 
+              {/* Status Badge */}
               <span
-                className={`mt-3 md:mt-0 px-3 py-1 text-xs rounded-full font-semibold ${
-                  item.status === "completed"
-                    ? "bg-green-100 text-green-700"
-                    : "bg-yellow-100 text-yellow-700"
+                className={`px-3 py-1 text-sm rounded-full font-bold uppercase tracking-wider ${
+                  isCompleted
+                    ? "bg-green-100 text-green-700 ring-1 ring-green-300"
+                    : "bg-yellow-100 text-yellow-700 ring-1 ring-yellow-300"
                 }`}
               >
-                {item.status.toUpperCase()}
+                {item.status}
               </span>
             </div>
 
-            {/* Rating Section */}
-            {item.status === "completed" && (
-              <div className="flex flex-col md:flex-row items-start md:items-center gap-4 mt-3">
-                {serverRatings[item._id] ? (
-                  <div className="space-y-2">
-                    <p className="text-lg font-semibold bg-white/20 px-4 py-2 rounded-full shadow-md flex items-center gap-2">
-                      <Star size={18} className="text-yellow-300" /> You rated:{" "}
-                      <span className="text-yellow-300 font-bold">
-                        {serverRatings[item._id]?.rating}
-                      </span>
+            {/* 2. Booking Details */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-6 text-gray-700 text-sm">
+                
+                <div className="flex items-center gap-2">
+                    <Briefcase size={16} className="text-indigo-500 flex-shrink-0" />
+                    <span className="font-semibold">Service:</span>
+                    <span className="truncate">{item.providerId?.category || 'N/A'}</span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <Calendar size={16} className="text-teal-500 flex-shrink-0" />
+                    <span className="font-semibold">Date:</span>
+                    <span>{formattedDate}</span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <Clock size={16} className="text-red-400 flex-shrink-0" />
+                    <span className="font-semibold">Time:</span>
+                    <span>{formattedTime}</span>
+                </div>
+            </div>
+
+            {/* 3. Rating/Review Section */}
+            {isCompleted && (
+              <div className="mt-5 pt-4 border-t border-gray-100">
+                <h4 className="text-lg font-semibold text-gray-800 mb-3">Your Feedback</h4>
+                
+                {existingRating ? (
+                  // Display Existing Review
+                  <div className="space-y-3">
+                    <p className="text-base font-bold text-blue-800 bg-blue-50/70 px-4 py-2 rounded-lg shadow-sm flex items-center gap-2">
+                      <Star size={18} className="text-yellow-500 fill-yellow-500" /> 
+                      Rated: 
+                      <span className="text-blue-900 font-extrabold">{existingRating.rating}</span>
                       /5
                     </p>
 
-                    {serverRatings[item._id]?.comment && (
-                      <p className="text-sm font-semibold bg-white/20 px-4 py-2 rounded-full shadow-md flex items-center gap-2">
-                        <MessageSquare size={16} className="text-yellow-300" />
-                        Your comment:{" "}
-                        <span className="text-yellow-300 font-bold">
-                          {serverRatings[item._id]?.comment}
-                        </span>
+                    {existingRating.comment && (
+                      <p className="text-sm font-medium text-gray-700 bg-gray-100 px-4 py-2 rounded-lg flex items-start gap-2">
+                        <MessageSquare size={16} className="text-blue-500 mt-1 flex-shrink-0" />
+                        <span className="font-semibold">Comment:</span>
+                        <span>{existingRating.comment}</span>
                       </p>
                     )}
                   </div>
                 ) : (
-                  <>
-                    <label className="text-sm flex items-center gap-2">
-                      <Star size={16} /> Rate:
+                  // New Review Form
+                  <div className="space-y-3">
+                    <label className="block text-sm font-medium text-gray-700">
+                        Rating (1-5)
+                    </label>
+                    <div className="flex flex-col sm:flex-row gap-3">
                       <input
                         type="number"
                         min={1}
                         max={5}
                         value={ratings[item._id] || ""}
                         onChange={(e) => handleRatingChange(e, item._id)}
-                        className="w-16 rounded-md border border-white bg-white/20 text-white text-center font-semibold focus:outline-none focus:ring-2 focus:ring-yellow-300"
+                        placeholder="e.g., 5"
+                        className="w-full sm:w-20 border border-gray-300 rounded-lg px-3 py-2 bg-gray-50 text-gray-800 text-center font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
-                    </label>
-                    <input
-                      type="text"
-                      value={comment}
-                      onChange={onChange}
-                      name="comment"
-                      placeholder="Comment"
-                      className="w-100 rounded-md border border-white bg-white/20 text-white text-center font-semibold focus:outline-none focus:ring-2 focus:ring-yellow-300"
-                    />
-
+                      <input
+                        type="text"
+                        value={comment}
+                        onChange={onChange}
+                        name="comment"
+                        placeholder="Optional comment (e.g., Great service!)"
+                        className="flex-1 w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-50 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    
                     <button
-                      className="w-full md:w-40 bg-white text-blue-700 font-semibold py-2 px-4 rounded-full shadow-md hover:shadow-lg hover:bg-blue-100 transition-all duration-200"
+                      className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition-all duration-200 mt-2"
                       onClick={() =>
                         handleSubmitRating(
                           item._id,
@@ -191,15 +204,16 @@ export default function BookingCard({ provider }) {
                         )
                       }
                     >
-                      Submit Rating
+                      Submit Review
                     </button>
-                  </>
+                  </div>
                 )}
               </div>
             )}
 
+            {/* Message/Error Display */}
             {message && (
-              <p className="mt-3 text-sm text-yellow-200 font-medium italic">
+              <p className={`mt-4 text-sm font-medium italic ${message.startsWith('✅') ? 'text-green-600' : 'text-red-500'}`}>
                 {message}
               </p>
             )}
